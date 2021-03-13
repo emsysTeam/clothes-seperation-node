@@ -6,7 +6,7 @@ const ejs = require("ejs");
 require("dotenv").config();
 const app = express();
 const pythonShell = require("python-shell");
-
+const fs = require('fs');
 /**
  * requirement variables for server.js
  */
@@ -22,12 +22,33 @@ app.use(require("body-parser").urlencoded({extended:true}));
 app.set('view engines', ejs);
 app.set('views', __dirname, + './views');
 
+
+/**
+ * API routes & template URL
+ */
 app.get('/', function(request,response){
     response.render('template/image.ejs', {title:"image", clickHanlder: "image"})
 })
 
+app.post('/test', function(req,res){
+    fs.writeFile('./clothes_seperation_prediction',req.body.img, 'base64',function(err,data){
+        if(err){console.log(err)}
+    })
 
+    let options = {
+        scriptPath: './clothes_seperation_prediction',
+    }
 
+    console.log("prediction executued!!!!!!");
+
+    pythonShell.PythonShell.run("run.py",options, function(err,results){
+        if(err){
+            console.log("python file execution error : " + err);
+            throw err;
+        }
+        return;
+    })
+})
 
 /**
  * server start with PORT (default= 3000)

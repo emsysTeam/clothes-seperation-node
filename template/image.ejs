@@ -9,14 +9,86 @@
     width: 300px;
     height: 300px;
   }
-</style>
 
+  .square{
+      border:0;
+      width:80px;
+      padding:0px;
+      margin-top: 90px;
+      margin-left: calc(50% - 40px);
+      margin-left: -webkit-calc(50% - 40px);
+      margin-left: -moz-calc(50% - 40px);
+    }
+
+  .spin {
+    height: 70px;
+    width: 70px;
+    border-radius: 50%;
+    border:dashed 5px darkblue;
+    -webkit-animation-name: spin;
+    -webkit-animation-duration: 1.5s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+  }
+
+  @-webkit-keyframes spin {
+    from   {  -webkit-transform: rotate(0deg); }
+    to   {  -webkit-transform: rotate(360deg); }
+  }
+</style>
+<script>
+let data;
+
+function clean() {
+  if(document.querySelector("div#image_container *"))  document.querySelector("div#image_container *").remove();
+  else return;
+}
+
+function preview(event) {
+    let reader = new FileReader();
+    reader.onload = function (event) {
+      let img = document.createElement("img");
+      img.setAttribute("src", event.target.result);
+      document.querySelector("div#image_container").appendChild(img);
+      data = event.target.result.slice(22, event.target.result.length);
+    };
+    reader.readAsDataURL(event.target.files[0]);
+  }
+
+function show() {
+  document.querySelector("div#image_container *").remove();
+  document.querySelector("div.square").appendChild(document.createElement('div')).classList.add('spin')
+  document.querySelector("div.square").appendChild(document.createElement('div')).innerHTML = " Loading..."
+
+  var xmlhttp = new XMLHttpRequest();
+
+  xmlhttp.onreadystatechange = function () {
+    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+      result = xmlhttp.responseText;
+      console.log(result);
+      let image = new Image();
+      image.src = "data:image/jpeg;base64," + result.slice(10, result.length - 3);
+      document.querySelector("div.square").childNodes[4].innerHTML = "";
+      document.querySelector("div.square *").remove();
+      document.querySelector("div#image_container").appendChild(image);
+    }
+  };
+  xmlhttp.open("POST", "./test", true);
+  xmlhttp.setRequestHeader('Content-Type', 'application/json');
+  if (typeof data === "undefined") {
+    alert("no file")
+    return;
+  }
+  xmlhttp.send(JSON.stringify({ "img": data }));
+}
+</script>
 <body>
   <input type="file" id="real-input" class="image_inputType_file" onchange="preview(event)" accept="img/*"
     onClick="clean()" />
 
-  <button onClick="show()">test</button>
+  <button onClick="show()">예측</button>
   <div id="image_container"></div>
+  <div class="square"></div>
 </body>
 
 </html>
