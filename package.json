@@ -1,0 +1,23 @@
+{
+  "name": "clothes-seperation-node",
+  "version": "1.0.0",
+  "description": "this is about extraction clothes from image based nodejs",
+  "main": ".mongorc.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "clothes"
+  ],
+  "author": "hyojin",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.2.0",
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.7",
+    "python-shell": "^2.0.3"
+  }
+}
