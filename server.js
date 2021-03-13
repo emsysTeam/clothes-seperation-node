@@ -21,34 +21,44 @@ app.use(express.json({
 app.use(require("body-parser").urlencoded({extended:true}));
 app.set('view engines', ejs);
 app.set('views', __dirname, + './views');
-
+app.use(express.static( "public" ));
 
 /**
  * API routes & template URL
  */
 app.get('/', function(request,response){
-    response.render('template/image.ejs', {title:"image", clickHanlder: "image"})
+    response.render('template/image.ejs')
 })
 
-app.post('/test', function(req,res){
-    fs.writeFile('./clothes_seperation_prediction',req.body.img, 'base64',function(err,data){
+app.post('/test', async function(req,res){
+    await fs.writeFile('./clothes_seperation_prediction/test.png',req.body.img, 'base64',function(err,data){
         if(err){console.log(err)}
     })
 
     let options = {
-        scriptPath: './clothes_seperation_prediction',
+        pythonOptions: ['-u'],
+        args: ['test.png'] //should be image name
     }
 
     console.log("prediction executued!!!!!!");
-
-    pythonShell.PythonShell.run("run.py",options, function(err,results){
-        if(err){
-            console.log("python file execution error : " + err);
-            throw err;
-        }
-        return;
-    })
+    try {
+      pythonShell.PythonShell.run("./clothes_seperation_prediction/run.py", options, function(err,results){
+              if(err){
+                  console.log("python file execution error : " + err);
+                  res.json({'result':'fail'});
+                  throw err;
+              }
+              else{
+                res.json({'result':'success'});
+                return;
+              }
+          })
+    } catch (error) {
+      console.log("python shell execution error : " + error);
+      throw error;
+    }
 })
+
 
 /**
  * server start with PORT (default= 3000)

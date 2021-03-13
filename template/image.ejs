@@ -2,8 +2,10 @@
 
 <head>
   <meta charset="utf-8" />
-  <title>SCREEN AI TEST PAGE</title>
+  <title>IMAGE PAGE</title>
 </head>
+
+
 <style>
   #image_container {
     width: 300px;
@@ -25,24 +27,21 @@
     width: 70px;
     border-radius: 50%;
     border:dashed 5px darkblue;
-    -webkit-animation-name: spin;
-    -webkit-animation-duration: 1.5s;
-    -webkit-animation-iteration-count: infinite;
-    -webkit-animation-timing-function: linear;
+    animation-name: spin;
+    animation-duration: 1.5s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
   }
 
-  @-webkit-keyframes spin {
+  @keyframes spin {
     from   {  -webkit-transform: rotate(0deg); }
     to   {  -webkit-transform: rotate(360deg); }
   }
 </style>
+
+
 <script>
 let data;
-
-function clean() {
-  if(document.querySelector("div#image_container *"))  document.querySelector("div#image_container *").remove();
-  else return;
-}
 
 function preview(event) {
     let reader = new FileReader();
@@ -58,21 +57,28 @@ function preview(event) {
 function show() {
   document.querySelector("div#image_container *").remove();
   document.querySelector("div.square").appendChild(document.createElement('div')).classList.add('spin')
-  document.querySelector("div.square").appendChild(document.createElement('div')).innerHTML = " Loading..."
+  document.querySelector("div.square").appendChild(document.createElement('p')).innerText='Loading...';
+
 
   var xmlhttp = new XMLHttpRequest();
 
   xmlhttp.onreadystatechange = function () {
     if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
       result = xmlhttp.responseText;
-      console.log(result);
-      let image = new Image();
-      image.src = "data:image/jpeg;base64," + result.slice(10, result.length - 3);
-      document.querySelector("div.square").childNodes[4].innerHTML = "";
-      document.querySelector("div.square *").remove();
-      document.querySelector("div#image_container").appendChild(image);
+      const res = JSON.parse(result);
+      if (res.result === "success") {
+        let image = new Image();
+        image.src = '/images/out.png';
+        document.querySelector("div#image_container").appendChild(image);
+        document.querySelector("div.square").children[1].remove();
+        document.querySelector("div.square *").remove();
+      }
+      else {
+        return;
+      }
     }
   };
+
   xmlhttp.open("POST", "./test", true);
   xmlhttp.setRequestHeader('Content-Type', 'application/json');
   if (typeof data === "undefined") {
@@ -82,9 +88,10 @@ function show() {
   xmlhttp.send(JSON.stringify({ "img": data }));
 }
 </script>
+
+
 <body>
-  <input type="file" id="real-input" class="image_inputType_file" onchange="preview(event)" accept="img/*"
-    onClick="clean()" />
+  <input type="file" id="real-input" class="image_inputType_file" onchange="preview(event)" accept="img/*" />
 
   <button onClick="show()">예측</button>
   <div id="image_container"></div>

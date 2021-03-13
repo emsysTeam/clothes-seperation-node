@@ -3,15 +3,11 @@ import numpy as np
 from tensorflow.keras.models import load_model
 import tensorflow as tf
 import sys
-from tensorflow.compat.v1 import ConfigProto
-from tensorflow.compat.v1 import InteractiveSession
-config = ConfigProto()
-config.gpu_options.allow_growth = True
-session = InteractiveSession(config=config)
 
 f = sys.argv[1]
 
-saved = load_model("./model/save_ckp_frozen.h5")
+saved = load_model("./clothes_seperation_prediction/model/save_ckp_frozen.h5")
+#saved = load_model("./model/save_ckp_frozen.h5")
 
 class fashion_tools(object):
     def __init__(self,imageid,model,version=1.1):
@@ -23,7 +19,7 @@ class fashion_tools(object):
         """limited to top wear and full body dresses (wild and studio working)"""
         """takes input rgb----> return PNG"""
         name =  self.imageid
-        file = cv2.imread(name)
+        file = cv2.imread('./clothes_seperation_prediction/'+ name)
         file = tf.image.resize_with_pad(file,target_height=512,target_width=512)
         rgb  = file.numpy()
         file = np.expand_dims(file,axis=0)/ 255.
@@ -48,5 +44,5 @@ class fashion_tools(object):
 
 # running code
 api = fashion_tools(f, saved)
-image_ = api.get_dress(True)
-cv2.imwrite("out.png", image_)
+image_ = api.get_dress()
+cv2.imwrite("./public/images/out.png", image_)
