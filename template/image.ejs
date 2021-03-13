@@ -44,18 +44,22 @@
 let data;
 
 function preview(event) {
+  if (document.querySelector("div#image_container img")) {
+    document.querySelector("div#image_container *").remove();
+  }
     let reader = new FileReader();
     reader.onload = function (event) {
-      let img = document.createElement("img");
-      img.setAttribute("src", event.target.result);
-      document.querySelector("div#image_container").appendChild(img);
+      document.querySelector('img#preview_image').setAttribute("src", event.target.result);
       data = event.target.result.slice(22, event.target.result.length);
     };
     reader.readAsDataURL(event.target.files[0]);
   }
 
 function show() {
-  document.querySelector("div#image_container *").remove();
+  if(document.querySelector("div#image_container img")) {
+    document.querySelector("div#image_container *").remove();
+  }
+  document.querySelector('img#preview_image').setAttribute("src","");
   document.querySelector("div.square").appendChild(document.createElement('div')).classList.add('spin')
   document.querySelector("div.square").appendChild(document.createElement('p')).innerText='Loading...';
 
@@ -95,6 +99,7 @@ function show() {
 
   <button onClick="show()">예측</button>
   <div id="image_container"></div>
+  <img id='preview_image' />
   <div class="square"></div>
 </body>
 
